@@ -93,7 +93,28 @@ export async function approveJoinRequest(orgId, targetUserId, approverId) {
     status: 'approved',
   })
   // Update user doc
-  await setDoc(doc(db, 'users', targetUserId), { currentOrgId: orgId }, { merge: true })
+  const userRef =
+  doc(db, "users", targetUserId);
+
+const userSnap =
+  await getDoc(userRef);
+
+const existingOrgIds =
+  userSnap.data()?.orgIds || [];
+
+await setDoc(
+  userRef,
+  {
+    currentOrgId: orgId,
+    orgIds: [
+      ...new Set([
+        ...existingOrgIds,
+        orgId,
+      ]),
+    ],
+  },
+  { merge: true }
+);
 }
 
 export async function denyJoinRequest(orgId, targetUserId) {

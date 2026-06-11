@@ -52,13 +52,18 @@ export default function ManagerDashboard() {
 }, [org]);
 
   const handleApprove = async (userId) => {
-    try {
-      await approveJoinRequest(org.id, userId);
+  try {
+    await approveJoinRequest(
+      org.id,
+      userId,
+      user.uid
+    );
       setPendingRequests((r) => r.filter((req) => req.userId !== userId));
       toast.success("Member approved!");
-    } catch {
-      toast.error("Failed to approve");
-    }
+    } catch (err) {
+  console.error(err);
+  toast.error("Failed to approve");
+}
   };
 
   const handleDeny = async (userId) => {
