@@ -47,6 +47,104 @@ export async function generateReport({
           e.date <= endDate
       );
 
+      /* =========================
+   FINANCE DATA
+========================= */
+
+const financeQ = query(
+  collection(db, "financeEntries"),
+  where("orgId", "==", orgId),
+  where("projectId", "==", projectId)
+);
+
+const financeSnap =
+  await getDocs(financeQ);
+
+const financeEntries =
+  financeSnap.docs
+    .map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }))
+    .filter(
+      (e) =>
+        e.date >= startDate &&
+        e.date <= endDate
+    );
+
+const totalIncome =
+  financeEntries
+    .filter(
+      (e) => e.type === "INCOME"
+    )
+    .reduce(
+      (sum, e) =>
+        sum +
+        Number(e.amount || 0),
+      0
+    );
+
+const totalExpense =
+  financeEntries
+    .filter(
+      (e) => e.type === "EXPENSE"
+    )
+    .reduce(
+      (sum, e) =>
+        sum +
+        Number(e.amount || 0),
+      0
+    );
+
+const balance =
+  totalIncome -
+  totalExpense;
+
+/* PARTY SUMMARY */
+
+const partySummary = {};
+
+financeEntries.forEach((entry) => {
+
+  const party =
+    entry.name?.trim() ||
+    entry.vendor?.trim() ||
+    "Unknown";
+
+  if (!partySummary[party]) {
+    partySummary[party] = {
+      count: 0,
+      amount: 0,
+      income: 0,
+      expense: 0,
+      net: 0,
+    };
+  }
+
+  const amount =
+    Number(entry.amount || 0);
+
+  partySummary[party].count += 1;
+
+  if (entry.type === "INCOME") {
+
+    partySummary[party].income += amount;
+
+  } else if (
+    entry.type === "EXPENSE"
+  ) {
+
+    partySummary[party].expense += amount;
+  }
+
+  partySummary[party].net =
+    partySummary[party].income -
+    partySummary[party].expense;
+
+  partySummary[party].amount += amount;
+
+});
+
     const grouped = {};
 
     entries.forEach((entry) => {
@@ -121,6 +219,16 @@ export async function generateReport({
 
   inventoryEntries:
     entries,
+
+  financeEntries,
+
+  financeSummary: {
+    totalIncome,
+    totalExpense,
+    balance,
+  },
+
+  partySummary,
 });
   }
 

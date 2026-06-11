@@ -409,7 +409,232 @@ export default function PDFExport() {
         </div>
       ))}
     </div>
+    {/* FINANCE REPORT */}
+
+<div
+  style={{
+    marginTop: 20,
+    border: "1px solid #dbeafe",
+    borderRadius: 12,
+    overflow: "hidden"
+  }}
+>
+  <div
+    style={{
+      background: "#16a34a",
+      color: "#fff",
+      padding: "12px 16px",
+      fontWeight: 700
+    }}
+  >
+    FINANCE REPORT
   </div>
+
+  <div style={{ padding: 16 }}>
+
+    {/* Summary */}
+
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        flexWrap: "wrap",
+        marginBottom: 20
+      }}
+    >
+
+      <div
+        style={{
+          border: "1px solid #d1d5db",
+          borderRadius: 8,
+          padding: 12,
+          minWidth: 160
+        }}
+      >
+        <div>Total Income</div>
+
+        <div
+          style={{
+            color: "#16a34a",
+            fontSize: 20,
+            fontWeight: 700
+          }}
+        >
+          ₹{Number(
+            project.financeSummary?.totalIncome || 0
+          ).toLocaleString()}
+        </div>
+      </div>
+
+      <div
+        style={{
+          border: "1px solid #d1d5db",
+          borderRadius: 8,
+          padding: 12,
+          minWidth: 160
+        }}
+      >
+        <div>Total Expense</div>
+
+        <div
+          style={{
+            color: "#dc2626",
+            fontSize: 20,
+            fontWeight: 700
+          }}
+        >
+          ₹{Number(
+            project.financeSummary?.totalExpense || 0
+          ).toLocaleString()}
+        </div>
+      </div>
+
+      <div
+        style={{
+          border: "1px solid #d1d5db",
+          borderRadius: 8,
+          padding: 12,
+          minWidth: 160
+        }}
+      >
+        <div>Balance</div>
+
+        <div
+          style={{
+            color: "#2563eb",
+            fontSize: 20,
+            fontWeight: 700
+          }}
+        >
+          ₹{Number(
+            project.financeSummary?.balance || 0
+          ).toLocaleString()}
+        </div>
+      </div>
+
+    </div>
+
+    {/* TOP PARTIES */}
+
+    <h3
+      style={{
+        marginBottom: 12,
+        fontSize: 18,
+        fontWeight: 700
+      }}
+    >
+      Top Parties
+    </h3>
+
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 12
+      }}
+    >
+
+      {Object.entries(
+        project.partySummary || {}
+      )
+        .sort(
+          (a, b) =>
+            Math.abs(b[1].net) -
+            Math.abs(a[1].net)
+        )
+        .slice(0, 10)
+        .map(([name, data]) => (
+
+          <div
+            key={name}
+            style={{
+              border: "1px solid #d1d5db",
+              borderRadius: 8,
+              padding: 12,
+              width: 220
+            }}
+          >
+
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 16
+              }}
+            >
+              {name}
+            </div>
+
+            <div>
+              Transactions: {data.count}
+            </div>
+
+            <div
+              style={{
+                color: "#16a34a"
+              }}
+            >
+              Income:
+              ₹{Number(
+                data.income || 0
+              ).toLocaleString()}
+            </div>
+
+            <div
+              style={{
+                color: "#dc2626"
+              }}
+            >
+              Expense:
+              ₹{Number(
+                data.expense || 0
+              ).toLocaleString()}
+            </div>
+
+            {data.net >= 0 ? (
+
+              <div
+                style={{
+                  color: "#16a34a",
+                  fontWeight: 700,
+                  marginTop: 6
+                }}
+              >
+                NET PROFIT:
+                ₹{Number(
+                  data.net
+                ).toLocaleString()}
+              </div>
+
+            ) : (
+
+              <div
+                style={{
+                  color: "#dc2626",
+                  fontWeight: 700,
+                  marginTop: 6
+                }}
+              >
+                NET LOSS:
+                -₹{Number(
+                  Math.abs(data.net)
+                ).toLocaleString()}
+              </div>
+
+            )}
+
+          </div>
+
+        ))}
+
+    </div>
+
+  </div>
+</div>
+
+
+  </div>
+
+  
 ))}
 
           {/* Footer */}
